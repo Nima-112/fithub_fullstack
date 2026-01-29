@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, ShoppingCart, User, Search, Dumbbell, LogOut, Package, Heart } from 'lucide-react';
+import { Menu, X, ShoppingCart, User, Search, Dumbbell, LogOut, Package, Heart, LayoutDashboard } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { cn } from '@/app/lib/utils';
 import { userApi } from '@/app/lib/api';
@@ -14,6 +14,7 @@ interface UserProfile {
         name: string;
         avatar?: string;
     };
+    role: string;
 }
 
 export const Navbar: React.FC = () => {
@@ -160,6 +161,16 @@ export const Navbar: React.FC = () => {
                                             <p className="text-sm text-dark-text-secondary">{user.email}</p>
                                         </div>
                                         <div className="py-2">
+                                            {user.role === 'admin' && (
+                                                <Link
+                                                    href="/admin"
+                                                    className="flex items-center gap-3 px-4 py-2 text-primary-neon font-semibold bg-primary-neon/10 hover:bg-primary-neon/20 transition-colors"
+                                                    onClick={() => setIsProfileDropdownOpen(false)}
+                                                >
+                                                    <LayoutDashboard className="w-4 h-4" />
+                                                    <span>Admin Panel</span>
+                                                </Link>
+                                            )}
                                             <Link
                                                 href="/orders"
                                                 className="flex items-center gap-3 px-4 py-2 text-dark-text-primary hover:bg-dark-bg-tertiary transition-colors"

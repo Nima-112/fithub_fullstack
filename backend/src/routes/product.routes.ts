@@ -7,8 +7,10 @@ import {
     getBrands,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getRecommendations
 } from '../controllers/product.controller';
+import { protect, authorize } from '../middleware/auth.middleware';
 
 const router = Router();
 
@@ -18,10 +20,11 @@ router.get('/featured', getFeaturedProducts);
 router.get('/categories', getCategories);
 router.get('/brands', getBrands);
 router.get('/:id', getProductById);
+router.get('/:id/recommendations', getRecommendations);
 
-// Admin routes (TODO: Add auth middleware)
-router.post('/', createProduct);
-router.put('/:id', updateProduct);
-router.delete('/:id', deleteProduct);
+// Admin routes
+router.post('/', protect, authorize('admin'), createProduct);
+router.put('/:id', protect, authorize('admin'), updateProduct);
+router.delete('/:id', protect, authorize('admin'), deleteProduct);
 
 export default router;

@@ -41,7 +41,7 @@ passport.use(
                         },
                         // No password needed for OAuth users
                         password: Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8),
-                        role: 'customer'
+                        role: 'user'
                     });
 
                     return done(null, user);

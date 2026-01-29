@@ -29,7 +29,7 @@ const cleanPrice = (priceStr: string): number => {
 
 // Parse CSV and import products
 const importProducts = async () => {
-    const csvPath = path.join(__dirname, '../../..', 'Decathlon_data.csv');
+    const csvPath = path.join(__dirname, '../../..', 'Decathlon_data2.csv');
 
     if (!fs.existsSync(csvPath)) {
         console.error(`❌ CSV file not found at: ${csvPath}`);

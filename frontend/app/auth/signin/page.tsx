@@ -27,7 +27,12 @@ export default function SignInPage() {
             if (response.success) {
                 localStorage.setItem('token', response.token);
                 localStorage.setItem('user', JSON.stringify(response.user));
-                router.push('/');
+
+                if (response.user.role === 'admin') {
+                    router.push('/admin');
+                } else {
+                    router.push('/');
+                }
             } else {
                 setError(response.message || 'Login failed');
             }

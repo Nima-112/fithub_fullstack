@@ -243,3 +243,80 @@ export const deleteProduct = async (req: Request, res: Response) => {
         });
     }
 };
+
+// Get product recommendations
+export const getRecommendations = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const limit = Number(req.query.limit) || 5;
+
+        // 1. Get the product to find its SKU
+        const product = await Product.findById(id);
+
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: 'Product not found'
+            });
+        }
+
+        // 2. Call ML Service
+        const mlServiceUrl = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+        try {
+            const axios = require('axios');
+            const mlResponse = await axios.post(`${mlServiceUrl}/api/ml/recommend`, {
+                sku: product.sku,
+                limit
+            });
+
+            if (mlResponse.data.success && mlResponse.data.recommendations) {
+                const recommendedSkus = mlResponse.data.recommendations.map((rec: any) => rec.sku);
+
+                // 3. Fetch products from MongoDB
+                const recommendations = await Product.find({
+                    sku: { $in: recommendedSkus }
+                });
+
+                // Sort to match recommendation order if possible, or just return
+                // Doing a simple return for now
+
+                return res.json({
+                    success: true,
+                    data: recommendations
+                });
+            }
+        } catch (mlError) {
+            console.error('ML Service Error:', mlError);
+            // Fallback: Return products from same category
+            const fallbackRecommendations = await Product.find({
+                category: product.category,
+                _id: { $ne: product._id }
+            }).limit(limit);
+
+            return res.json({
+                success: true,
+                data: fallbackRecommendations,
+                source: 'fallback'
+            });
+        }
+
+        // Default fallback if ML service fails silently or returns no data
+        const fallbackRecommendations = await Product.find({
+            category: product.category,
+            _id: { $ne: product._id }
+        }).limit(limit);
+
+        res.json({
+            success: true,
+            data: fallbackRecommendations,
+            source: 'fallback'
+        });
+
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching recommendations',
+            error: error.message
+        });
+    }
+};

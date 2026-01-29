@@ -51,6 +51,13 @@ export const productApi = {
         const response = await api.get('/products/brands');
         return response.data;
     },
+    // Get recommendations
+    getRecommendations: async (id: string, limit: number = 4) => {
+        const response = await api.get(`/products/${id}/recommendations`, {
+            params: { limit }
+        });
+        return response.data;
+    },
 };
 
 // Auth API
@@ -98,9 +105,40 @@ export const userApi = {
         return response.data;
     },
 
-    // Orders
     getOrders: async () => {
         const response = await api.get('/orders/myorders');
+        return response.data;
+    }
+};
+
+// Admin API
+export const adminApi = {
+    getStats: async () => {
+        const response = await api.get('/admin/stats');
+        return response.data;
+    },
+    getUsers: async () => {
+        const response = await api.get('/admin/users');
+        return response.data;
+    },
+    deleteUser: async (id: string) => {
+        const response = await api.delete(`/admin/users/${id}`);
+        return response.data;
+    },
+    updateUserRole: async (id: string, role: string) => {
+        const response = await api.put(`/admin/users/${id}/role`, { role });
+        return response.data;
+    },
+    deleteProduct: async (id: string) => {
+        const response = await api.delete(`/products/${id}`); // Using existing product route, assume admin has rights
+        return response.data;
+    },
+    createProduct: async (productData: any) => {
+        const response = await api.post('/products', productData);
+        return response.data;
+    },
+    updateProduct: async (id: string, productData: any) => {
+        const response = await api.put(`/products/${id}`, productData);
         return response.data;
     }
 };
